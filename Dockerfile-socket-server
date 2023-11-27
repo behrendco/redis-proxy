@@ -1,0 +1,11 @@
+FROM python:latest
+
+WORKDIR /code
+
+COPY ./requirements.txt /code
+RUN pip3 install -r requirements.txt
+
+COPY ./src /code/src
+COPY ./tests/test_tcp /code/tests
+
+CMD python3 src/socket_server.py

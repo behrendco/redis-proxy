@@ -1,0 +1,6 @@
+redis
+flask
+pytest
+requests
+gunicorn
+gevent

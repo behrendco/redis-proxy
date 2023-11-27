@@ -1,0 +1,45 @@
+services:
+   redis: 
+     image: redislabs/redismod
+     platform: linux/amd64
+     container_name: redis
+     ports:
+       - "${REDIS_PORT}:${REDIS_PORT}"
+   flask:
+     build: .
+     container_name: flask
+     environment:
+        - PROXY_HOST=${PROXY_HOST}
+        - PROXY_PORT=${PROXY_PORT}
+        - WORKER_CONNECTIONS=${WORKER_CONNECTIONS}
+        - CACHE_CAPACITY=${CACHE_CAPACITY}
+        - CACHE_EXPIRY_DURATION=${CACHE_EXPIRY_DURATION}
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
+        - REDIS_DB=${REDIS_DB}
+        - TCP_IP=${TCP_IP}
+        - TCP_PORT=${TCP_PORT}
+     ports:
+        - "5001:${PROXY_PORT}"
+     depends_on:
+        - redis
+   socket_server:
+      build:
+        context: .
+        dockerfile: Dockerfile-socket-server
+      container_name: socket_server
+      environment:
+        - PROXY_HOST=${PROXY_HOST}
+        - PROXY_PORT=${PROXY_PORT}
+        - WORKER_CONNECTIONS=${WORKER_CONNECTIONS}
+        - CACHE_CAPACITY=${CACHE_CAPACITY}
+        - CACHE_EXPIRY_DURATION=${CACHE_EXPIRY_DURATION}
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
+        - REDIS_DB=${REDIS_DB}
+        - TCP_IP=${TCP_IP}
+        - TCP_PORT=${TCP_PORT}
+      ports:
+        - "${TCP_PORT}:${TCP_PORT}"
+      depends_on:
+        - redis
